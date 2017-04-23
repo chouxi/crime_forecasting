@@ -1,5 +1,5 @@
-function [data,countMaps,censusMaps] = generateByPeriodAndGrid(category,period,gridSz,saveGif)
-narginchk(4,4);
+function [data,countMaps,censusMaps] = generateByPeriodAndGrid(category,period,gridSz)
+narginchk(3,3);
 category = validatestring(category,{'ACFS','BURG','SC','TOA'});
 
 load(category)
