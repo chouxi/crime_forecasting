@@ -1,4 +1,4 @@
-function [lr_model, dev, stats] = logistic_regression_train(countMaps, censusMaps, hotspot_rate)
+function [lr_model, dev, stats] = logistic_regression(countMaps, censusMaps, hotspot_rate)
 	if size(countMaps) ~= size(censusMaps)
 		disp('Wrong shape of input data')
 	end
