@@ -1,4 +1,4 @@
 *.pyc
 /data
 .DS_Store
-*.gif
+*.m~

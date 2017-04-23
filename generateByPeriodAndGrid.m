@@ -1,6 +1,7 @@
 function [data,countMaps,censusMaps] = generateByPeriodAndGrid(category,period,gridSz)
 narginchk(3,3); 
 category = validatestring(category,{'ACFS','BURG','SC','TOA'});
+period = validatestring(period,{'1MO'});
 
 load(category)
 data = mergeByPeriod(X,Y,Census,T,period);
@@ -23,8 +24,6 @@ img = zeros(cols, rows);
 img_census = zeros(cols, rows);
 countMaps = zeros(length(data.summary), cols, rows);
 censusMaps = zeros(length(data.summary), cols, rows);
-filename_count = [category,'_',period,'_count.gif'];
-filename_census = [category,'_',period,'_census.gif'];
 for k = 1:length(data.summary)
     k
     coords = data.detail{k};
@@ -36,15 +35,8 @@ for k = 1:length(data.summary)
         img(ii) = sum(ind);
         img_census(ii) = mean(census(ind));
     end
+    img_census(isnan(img_census)) = 0;
     countMaps(k,:,:) = img;
     censusMaps(k,:,:) = img_census;
-    img = rescaleMat(img, 1, 255);
-    img_census = rescaleMat(img_census, 1, 255);
-    if k == 1
-        imwrite(img,filename_count,'gif', 'Loopcount',inf);
-        imwrite(img_census,filename_census,'gif', 'Loopcount',inf);
-    else
-        imwrite(img,filename_count,'gif','WriteMode','append');
-        imwrite(img_census,filename_census,'gif','WriteMode','append');
-    end
+    
 end
