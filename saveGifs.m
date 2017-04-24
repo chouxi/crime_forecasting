@@ -3,8 +3,8 @@ narginchk(4,4);
 category = validatestring(category,{'ACFS','BURG','SC','TOA'});
 period = validatestring(period,{'1MO'});
 
-filename_count = [category,'_',period,'_count.gif'];
-filename_census = [category,'_',period,'_census.gif'];
+filename_count = ['figs/',category,'_',period,'_count.gif'];
+filename_census = ['figs/',category,'_',period,'_census.gif'];
 
 for k = 1:size(countMaps,1)
     img = squeeze(countMaps(k,:,:));
