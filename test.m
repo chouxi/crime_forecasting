@@ -8,7 +8,7 @@ clc
 category = 'SC'; 
 period = '1MO';
 [data, countMaps, censusMaps] = generateByPeriodAndGrid(category,period,600);
-
+save([category,'_',period,'_countMaps'], 'countMaps')
 %% draw data (total)
 bar(1:length(data.summary), data.summary);
 title([category,'-',period]);
@@ -16,26 +16,31 @@ title([category,'-',period]);
 %% save gifs
 % saveGifs(category,period,countMaps,censusMaps);
 
-%% compute the range of number of hotspot
-[nRange, nTotal] = computeResultRange(600);
-
-%% precess maps
-[x_train, y_train] = images2inputs(countMaps(1:end-3,:,:));
-y_train = y_train(y_train~=0);
-x_train = x_train(y_train~=0,:);
-[x_train_norm, mu, sigma] = zscore(x_train);
-y_train_prob = rescaleMat(y_train,0,1);
-
 %% test GP
-gpModel = gaussian_process(x_train_norm, y_train_prob);
-L1 = resubLoss(gpModel);
-
-%% predict
-[x_test,y_test] = images2inputs(countMaps(end-2,:,:));
-x_test_norm = (x_test - mu)./sigma;
-y_test_prob = rescaleMat(y_test,0,1);
-[y_test_pred,~,yci] = predict(gpModel,x_test_norm);
+load('SC_1MO_countMaps')
+[model,img_test,img_pred,ysd,err_training,err_test] = gaussian_process(countMaps);
 
 %%
-img = reshape(y_test_prob,138,163);
-img_pred = reshape(y_test_pred,138,163);
+close all
+
+figure
+imshow(img_test,[]);
+
+figure
+imshow(img_pred,[]);
+
+ysd1 = ysd;
+ysd1( ysd1 > min(ysd1)+ (max(ysd1)-min(ysd1))*0.9 ) = 0;
+ysd_img = reshape(ysd1,138,163);
+img_pred_norm = img_pred.*ysd_img;
+err_norm = sqrt(mean( (img_pred_norm(:) - img_test(:)).^2 ));
+
+figure
+imshow(img_pred_norm, []);
+
+%% show PAI and PEI with respect to number of proposed grids
+close all
+% compute the range of number of hotspot
+gridSz = 600;
+[nRange, nTotal] = computeResultRange(gridSz);
+[PAI_pred,PEI_pred,PAI_best] = computePAIandPEI(img_pred_norm,img_test,nRange,true);
