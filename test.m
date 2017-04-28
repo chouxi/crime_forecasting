@@ -31,6 +31,7 @@ imshow(img_pred,[]);
 
 ysd1 = ysd;
 ysd1( ysd1 > min(ysd1)+ (max(ysd1)-min(ysd1))*0.9 ) = 0;
+ysd1( ysd1 ~=0 ) = 1;
 ysd_img = reshape(ysd1,138,163);
 img_pred_norm = img_pred.*ysd_img;
 err_norm = sqrt(mean( (img_pred_norm(:) - img_test(:)).^2 ));
@@ -44,3 +45,13 @@ close all
 gridSz = 600;
 [nRange, nTotal] = computeResultRange(gridSz);
 [PAI_pred,PEI_pred,PAI_best] = computePAIandPEI(img_pred_norm,img_test,nRange,true);
+
+
+%% simple average baseline
+close all
+period = '1MO';
+[img_test_base, img_pred_base] = baseline_average_over_chain(countMaps,period);
+% compute the range of number of hotspot
+gridSz = 600;
+[nRange, nTotal] = computeResultRange(gridSz);
+[PAI_pred_base,PEI_pred_base,PAI_best_base] = computePAIandPEI(img_pred_base,img_test_base,nRange,true);

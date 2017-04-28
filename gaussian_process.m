@@ -5,7 +5,7 @@ function [model,img_test,img_pred,ysd,err_training,err_test] = gaussian_process(
 [nt,ny,nx] = size(countMaps);
 x_train = [];
 y_train = [];
-for k=20:nt-3
+for k=1:nt-3
     countMap = squeeze(countMaps(k,:,:));
     [x,y] = image2input(countMap,k,-1);
     x_train = [x_train;x];
@@ -14,7 +14,7 @@ end
 [~, mu, sigma] = zscore(x_train);
 x_train = [];
 y_train = [];
-for k=20:nt-3
+for k=1:nt-3
     countMap = squeeze(countMaps(k,:,:));
     [x,y] = image2input(countMap,k,100);
     x_train = [x_train;x];
