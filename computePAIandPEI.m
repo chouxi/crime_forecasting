@@ -42,7 +42,7 @@ if showResult
     plot(best_ind,best_PEI,'ko','MarkerSize',10), hold off
     ylim([0,1]);
     title('PEI')
-    legend('ture', 'pred')
+    legend('true', 'pred')
     
     % show hotspot image
     img_result = img_test;

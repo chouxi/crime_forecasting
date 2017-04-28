@@ -55,3 +55,22 @@ period = '1MO';
 gridSz = 600;
 [nRange, nTotal] = computeResultRange(gridSz);
 [PAI_pred_base,PEI_pred_base,PAI_best_base] = computePAIandPEI(img_pred_base,img_test_base,nRange,true);
+
+%% simple temporal glm baseline
+close all
+period = '1MO';
+[img_test_temp_glm, img_pred_temp_glm] = baseline_temporal_glm(countMaps,period);
+% compute the range of number of hotspot
+gridSz = 600;
+[nRange, nTotal] = computeResultRange(gridSz);
+[PAI_pred_temp_glm,PEI_pred_temp_glm,PAI_best_temp_glm] = computePAIandPEI(img_pred_temp_glm,img_test_temp_glm,nRange,true);
+
+%% simple temporal gp baseline
+close all
+period = '1MO';
+[img_test_temp_gp, img_pred_temp_gp] = baseline_temporal_gp(countMaps,period);
+% compute the range of number of hotspot
+% gridSz = 600;
+% [nRange, nTotal] = computeResultRange(gridSz);
+% [PAI_pred_temp,PEI_pred_temp,PAI_best_temp] = computePAIandPEI(img_pred_temp,img_test_temp,nRange,true);
+
