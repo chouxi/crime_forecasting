@@ -42,7 +42,7 @@ xlabel('x');
 ylabel('count(total)');
 title('Estimation of count(total)');
 
-%% check distribution vs. time
+%% distribute crimes into each cell
 data = zeros(ny*nx,nt);
 for t=1:nt
     img = squeeze(countMaps(t,:,:));
@@ -52,6 +52,9 @@ for t=1:nt
 end
 mu = mean(data,2);
 mu = mu/sum(mu);
-% sigma = std(data,0,2);
+% check distribution vs. time
+sigma = std(data,0,2);
+disp(['maximum standard deviation of all grids = ', num2str(max(sigma))]);
+% distribute crimes
 data_img = f_bayes(end).*mu;
 img_pred = reshape(data_img,ny,nx);

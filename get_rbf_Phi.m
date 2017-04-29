@@ -1,4 +1,4 @@
-function Phi = get_rbf_Phi(x, mu, gamma)
+function Phi = get_rbf_Phi(x, mu, sigma)
 N = length(x);
 M = length(mu);
 Phi = zeros(N, M+1);
@@ -7,7 +7,7 @@ for i = 1:N
         if j==1
             Phi(i, j) = 1;
         else
-            Phi(i, j) = exp(-gamma(j-1) * ( x(i)-mu(j-1) )^2 );
+            Phi(i, j) = exp(-1/2*(x(i,:)-mu(j-1,:))*sigma(:,:,j-1)*(x(i,:)-mu(j-1,:))');
         end
     end
 end 

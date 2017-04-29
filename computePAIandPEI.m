@@ -45,13 +45,13 @@ if showResult
     legend('true', 'pred')
     
     % show hotspot image
-    img_result = img_test;
+    img_result = uint8((rescaleMat(img_test, 0, 255)));
     best_k = floor(nRange(1)) + best_ind - 1;
     ind_best = ind_test(1:best_k);
     ind_prop = ind_pred(1:best_k);
     [I,J] = ind2sub(size(img_test),ind_best);
     pos = [J I];
-    img_result = insertMarker(img_result,pos,'x','color','green','size',2);
+    img_result = insertMarker(img_result,pos,'+','color','green','size',2);
     [I,J] = ind2sub(size(img_test),ind_prop);
     pos = [J I];
     img_result = insertMarker(img_result,pos,'x','color','red','size',2);
