@@ -19,30 +19,20 @@ for k=1:nt-3
     [x,y] = image2input(countMap,k,100);
     x_train = [x_train;x];
     y_train = [y_train;y];
-    
-%     img = zeros(ny,nx);
-%     xCoord = x(:,1);
-%     yCoord = x(:,2);
-%     linearInd = sub2ind(size(img),yCoord,xCoord);
-%     img(linearInd) = y;
-%     imshow(img);
-%     title(num2str(k))
-%     w = waitforbuttonpress;
 end
 x_train_norm = (x_train - mu)./sigma;
 
 if exist('gpModel.mat', 'file') == 0
     % fit
     disp('begin fitting');
-    model = fitrgp(x_train_norm,y_train,'KernelFunction','squaredexponential','Sigma', 1.5);
-%     sigma0 = std(y_train);
-%     sigmaF0 = sigma0;
-%     d = size(x_train_norm,2);
-%     sigmaM0 = 10*ones(d,1);
-%     model = fitrgp(x_train_norm,y_train,'Basis','constant','FitMethod','exact',...
-%     'PredictMethod','exact','KernelFunction','ardsquaredexponential',...
-%     'KernelParameters',[sigmaM0;sigmaF0],'Sigma',sigma0,'Standardize',1);
-%     
+    sigma0 = std(y_train);
+    sigmaF0 = sigma0;
+    d = size(x_train_norm,2);
+    sigmaM0 = 10*ones(d,1);
+    model = fitrgp(x_train_norm,y_train,'Basis','constant','FitMethod','exact',...
+    'PredictMethod','exact','KernelFunction','ardsquaredexponential',...
+    'KernelParameters',[sigmaM0;sigmaF0],'Sigma',sigma0,'Standardize',1);
+    
 %     rng default
 %     model = fitrgp(x_train_norm,y_train,'KernelFunction','squaredexponential',...
 %     'OptimizeHyperparameters','auto','HyperparameterOptimizationOptions',...
