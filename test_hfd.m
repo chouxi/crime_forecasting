@@ -39,11 +39,38 @@ for k=1:nt
     values_collect = [values_collect values];
 end
 figure;
-for k=1:10
+for k=1:2:10
     values_per_month = values_collect(k,:);
     plot(values_per_month), hold on,
 end
 hold off
+
+%% draw percentage map for all cells with respect to time
+category = 'SC'; 
+period = '1MO';
+load([category,'_',period,'_countMaps'])
+
+close all
+[nt,ny,nx] = size(countMaps);
+dataOrig = zeros(ny*nx,nt);
+data = zeros(ny*nx,nt);
+for t=1:nt
+    img = squeeze(countMaps(t,:,:));
+    img = img(:);
+    dataOrig(:,t) = img;
+    data(:,t) = img/sum(img);
+end
+muOrig = mean(dataOrig,2);
+mu = mean(data,2);
+% check distribution vs. time
+sigmaOrig = std(dataOrig,0,2);
+sigma = std(data,0,2);
+figure,
+subplot(221), plot(muOrig),xlabel('image index'), ylabel('\mu (count)');
+subplot(222), plot(sigmaOrig),xlabel('image index'), ylabel('\sigma (count)');
+subplot(223), plot(mu),xlabel('image index'), ylabel('\mu (prob)');
+subplot(224), plot(sigma),xlabel('image index'), ylabel('\sigma (prob)');
+
 
 %% draw histogram of "# of crimes" in each month
 category = 'SC'; 
@@ -62,17 +89,17 @@ for t=1:nt
     img_noZero(img==0)=[];
     h = histogram(img_noZero,'Normalization','Probability');
     
-%     hold on,
-%     x = 1:20;
-%     lambda = 1;
-%     y = exp(-lambda).*lambda.^x./factorial(x);
-%     plot(x,y,'LineWidth',1.5)
-%     xlim([0,20]);
-%     title(num2str(t));
-%     filename = ['figs/hists/hist_',num2str(t),'.png'];
-%     saveas(f,filename)
-%     w = waitforbuttonpress;
-%     hold off,
+    hold on,
+    x = 1:20;
+    lambda = 1;
+    y = exp(-lambda).*lambda.^x./factorial(x);
+    plot(x,y,'LineWidth',1.5)
+    xlim([0,20]);
+    title(num2str(t));
+    filename = ['figs/hists/hist_',num2str(t),'.png'];
+    saveas(f,filename)
+    w = waitforbuttonpress;
+    hold off,
 end
 
 %% collect top 100 of each month and analyze each feature's relationship with (# of crimes)
