@@ -9,24 +9,26 @@ period = '1MO';
 %% gennerate image-like data
 category = 'SC'; 
 period = '1MO';
-
 gridSz = 600;
+
 [data, countMaps, censusMaps] = generateByPeriodAndGrid(category,period,gridSz);
-save([category,'_',period,'_countMaps'], 'countMaps')
+save([category,'_',period,'_',num2str(gridSz),'_countMaps'], 'countMaps')
 bar(1:length(data.summary), data.summary);
 title([category,'-',period]);
 
 %% save gifs
 category = 'SC'; 
 period = '1MO';
-load([category,'_',period,'_countMaps'])
+gridSz = 600;
+load([category,'_',period,'_',num2str(gridSz),'_countMaps'])
 
 saveGifs(category,period,countMaps,censusMaps);
 
 %% draw top 10 from the mean image with respect to time
 category = 'SC'; 
 period = '1MO';
-load([category,'_',period,'_countMaps'])
+gridSz = 600;
+load([category,'_',period,'_',num2str(gridSz),'_countMaps'])
 
 close all
 [nt,~,~] = size(countMaps);
@@ -48,7 +50,8 @@ hold off
 %% draw percentage map for all cells with respect to time
 category = 'SC'; 
 period = '1MO';
-load([category,'_',period,'_countMaps'])
+gridSz = 600;
+load([category,'_',period,'_',num2str(gridSz),'_countMaps'])
 
 close all
 [nt,ny,nx] = size(countMaps);
@@ -75,7 +78,8 @@ subplot(224), plot(sigma),xlabel('image index'), ylabel('\sigma (prob)');
 %% draw histogram of "# of crimes" in each month
 category = 'SC'; 
 period = '1MO';
-load([category,'_',period,'_countMaps'])
+gridSz = 600;
+load([category,'_',period,'_',num2str(gridSz),'_countMaps'])
 
 close all
 clc
@@ -105,7 +109,8 @@ end
 %% collect top 100 of each month and analyze each feature's relationship with (# of crimes)
 category = 'SC'; 
 period = '1MO';
-load([category,'_',period,'_countMaps'])
+gridSz = 600;
+load([category,'_',period,'_',num2str(gridSz),'_countMaps'])
 
 close all
 [nt,ny,nx] = size(countMaps);
@@ -130,45 +135,49 @@ C = cov(allData_norm)
 %% simple average baseline
 category = 'SC'; 
 period = '1MO';
-load([category,'_',period,'_countMaps'])
+gridSz = 600;
+load([category,'_',period,'_',num2str(gridSz),'_countMaps'])
 
 close all
 [img_test_base, img_pred_base] = baseline_average_over_chain(countMaps,period);
 % compute the range of number of hotspot
-gridSz = 600;
 [nRange, ~] = computeResultRange(gridSz);
 [PAI_pred_base,PEI_pred_base,PAI_best_base] = computePAIandPEI(img_pred_base,img_test_base,nRange,true);
 
 %% simple temporal GLM baseline
 category = 'SC'; 
 period = '1MO';
-load([category,'_',period,'_countMaps'])
+gridSz = 600;
+load([category,'_',period,'_',num2str(gridSz),'_countMaps'])
 
 close all
 [img_test_temp_glm, img_pred_temp_glm] = baseline_temporal_glm(countMaps,period);
 % compute the range of number of hotspot
-gridSz = 600;
-[nRange, nTotal] = computeResultRange(gridSz);
+[nRange, ~] = computeResultRange(gridSz);
 [PAI_pred_temp_glm,PEI_pred_temp_glm,PAI_best_temp_glm] = computePAIandPEI(img_pred_temp_glm,img_test_temp_glm,nRange,true);
 
 %% simple temporal GP baseline
 category = 'SC'; 
 period = '1MO';
-load([category,'_',period,'_countMaps'])
+gridSz = 600;
+load([category,'_',period,'_',num2str(gridSz),'_countMaps'])
 
 close all
 [img_test_temp_gp, img_pred_temp_gp] = baseline_temporal_gp(countMaps,period);
 % compute the range of number of hotspot
-gridSz = 600;
 [nRange, nTotal] = computeResultRange(gridSz);
 [PAI_pred_temp,PEI_pred_temp,PAI_best_temp] = computePAIandPEI(img_pred_temp_gp,img_test_temp_gp,nRange,true);
 
 %% Gaussian Progress ~ (x,y,t)
+clc
 category = 'SC'; 
 period = '1MO';
-load('SC_1MO_countMaps')
+gridSz = 600;
+load([category,'_',period,'_',num2str(gridSz),'_countMaps'])
 
 [model,img_test,img_pred,ysd,err_training,err_test] = gaussian_process(countMaps);
+
+close all
 figure, 
 subplot(121), imshow(img_test,[]);
 subplot(122), imshow(img_pred,[]);
@@ -183,7 +192,6 @@ figure
 imshow(img_pred_norm, []);
 
 % compute the range of number of hotspots
-gridSz = 600;
 [nRange, ~] = computeResultRange(gridSz);
 [PAI_pred,PEI_pred,PAI_best] = computePAIandPEI(img_pred_norm,img_test,nRange,true);
 

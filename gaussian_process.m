@@ -1,17 +1,8 @@
 function [model,img_test,img_pred,ysd,err_training,err_test] = gaussian_process(countMaps)
 
-% transfer images to features and counts and normalize
+% transfer images to features and counts
 
 [nt,ny,nx] = size(countMaps);
-x_train = [];
-y_train = [];
-for k=1:nt-3
-    countMap = squeeze(countMaps(k,:,:));
-    [x,y] = image2input(countMap,k,-1);
-    x_train = [x_train;x];
-    y_train = [y_train;y];
-end
-[~, mu, sigma] = zscore(x_train);
 x_train = [];
 y_train = [];
 for k=1:nt-3
@@ -20,23 +11,27 @@ for k=1:nt-3
     x_train = [x_train;x];
     y_train = [y_train;y];
 end
-x_train_norm = (x_train - mu)./sigma;
 
 if exist('gpModel.mat', 'file') == 0
     % fit
     disp('begin fitting');
     sigma0 = std(y_train);
     sigmaF0 = sigma0;
-    d = size(x_train_norm,2);
-    sigmaM0 = 10*ones(d,1);
-    model = fitrgp(x_train_norm,y_train,'Basis','constant','FitMethod','exact',...
-    'PredictMethod','exact','KernelFunction','ardsquaredexponential',...
-    'KernelParameters',[sigmaM0;sigmaF0],'Sigma',sigma0,'Standardize',1);
+    sigmaM0 = 10;
     
-%     rng default
-%     model = fitrgp(x_train_norm,y_train,'KernelFunction','squaredexponential',...
-%     'OptimizeHyperparameters','auto','HyperparameterOptimizationOptions',...
-%     struct('AcquisitionFunctionName','expected-improvement-plus'));
+    kfcn = @(XN,XM,theta) ...
+        (theta(1)^2)*exp( -(pdist2(XN(:,1:2),XM(:,1:2)).^2)/(2*theta(2)^2) ) +...
+        (theta(3)^2)*exp( -2*sin(pdist2(XN(:,3),XM(:,3))*pi/12).^2 /(theta(4).^2) )+ ...
+        (theta(5)^2)*exp( -(pdist2(XN(:,3),XM(:,3)).^2)/(2*theta(6)^2) );
+%         (theta(1)^2)*(1+sqrt(3)*pdist2(XN(:,1:2),XM(:,1:2))/theta(2))*exp(-sqrt(3)*pdist2(XN(:,1:2),XM(:,1:2))/theta(2)) +... % k_s(s,s')
+%         (theta(3)^2)*exp(-(pdist2(XN(:,3),XM(:,3)).^2)/(2*theta(4)^2));% +...  % k_t(t,t')
+%         (theta(5)^2)*(1+sqrt(3)*pdist2(XN(:,1:2),XM(:,1:2))/theta(6))*exp(-sqrt(3)*pdist2(XN(:,1:2),XM(:,1:2))/theta(6)) *...
+%         exp(-(pdist2(XN,XM).^2)/(2*theta(7)^2)) +...  % k_st(s,t,s',t')
+%         (theta(8)^2)*exp( -2*sin(pdist2(XN(:,3),XM(:,3))*pi/12).^2 )/(theta(9).^2);  %k_P(t,t')  
+
+    model = fitrgp(x_train,y_train,'KernelFunction',kfcn,'Sigma',sigma0,...
+        'KernelParameters',[sigmaF0,sigmaM0,sigmaF0,sigmaM0,sigmaF0,sigmaM0],...
+        'FitMethod','exact','PredictMethod','exact','Standardize',1);
 
     save('gpModel', 'model')
 else
@@ -52,8 +47,7 @@ err_training = sqrt(resubLoss(model));
 disp('begin predicting');
 countMap = squeeze(countMaps(end-2,:,:));
 [x_test,y_test] = image2input(countMap,nt-2,-1);
-x_test_norm = (x_test - mu)./sigma;
-[y_test_pred,ysd] = predict(model,x_test_norm);
+[y_test_pred,ysd] = predict(model,x_test);
 % weight = (ysd - min(ysd)) * (max(ysd) - min(ysd));
 % y_test_pred = y_test_pred.*weight;
 % estimate test error
