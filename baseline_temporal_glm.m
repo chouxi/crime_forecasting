@@ -32,8 +32,8 @@ if strcmp(period, '1MO')
 end
 
 figure;
-plot(x_test, t_test, 'g'); hold on,
-plot(x_test, f_bayes, 'r'); hold on,
+bar(x_test, t_test),ylim([0,4000]), hold on,
+plot(x_test, f_bayes, 'r', 'linewidth', 3); hold on,
 plot(x_test, f_bayes+sigma_N, 'r:'); hold on,
 plot(x_test, f_bayes-sigma_N, 'r:'); hold off,
 legend('Ground truth', 'Bayesian');

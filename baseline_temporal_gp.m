@@ -30,8 +30,8 @@ end
 
 [t_gp,tsd] = predict(model,x_test);
 figure;
-plot(x_test, t_test, 'g'); hold on,
-plot(x_test, t_gp, 'r'); hold on,
+bar(x_test, t_test); hold on,
+plot(x_test, t_gp, 'r', 'linewidth',3); hold on,
 plot(x_test, t_gp+tsd, 'r:'); hold on,
 plot(x_test, t_gp-tsd, 'r:'); hold off,
 legend('Ground truth', 'GP');

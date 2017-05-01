@@ -35,15 +35,26 @@ close all
 avg_img = squeeze(mean(countMaps,1));
 [~,ind] = sort(avg_img(:),'descend');
 values_collect = [];
+prob_collect = [];
 for k=1:nt
     countMap = squeeze(countMaps(k,:,:));
+    probMap = countMap./sum(countMap(:));
     values = countMap(ind(1:10));
     values_collect = [values_collect values];
+    prob = probMap(ind(1:10));
+    prob_collect = [prob_collect prob];
 end
 figure;
 for k=1:2:10
     values_per_month = values_collect(k,:);
     plot(values_per_month), hold on,
+end
+hold off
+
+figure;
+for k=1:2:10
+    prob_per_month = prob_collect(k,:);
+    plot(prob_per_month), hold on,
 end
 hold off
 
