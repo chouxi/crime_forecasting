@@ -206,3 +206,32 @@ imshow(img_pred_norm, []);
 [nRange, ~] = computeResultRange(gridSz);
 [PAI_pred,PEI_pred,PAI_best] = computePAIandPEI(img_pred_norm,img_test,nRange,true);
 
+%% general linear model
+category = 'SC'; 
+period = '1MO';
+gridSz = 600;
+load([category,'_',period,'_',num2str(gridSz),'_countMaps'])
+
+close all
+
+sum_count = mean(countMaps,1);
+sum_count = squeeze(sum_count);
+sum_count(sum_count<=2)=0;
+mean_num = 10;
+[idx_y, idx_x] = find(sum_count~=0);
+crime_mat = [idx_y, idx_x];
+[idx,C]= kmeans(crime_mat,mean_num);
+figure;
+plot(crime_mat(:,2),164-crime_mat(:,1),'k.');
+hold on
+for i=1:mean_num
+    plot(crime_mat(idx==i,2),164-crime_mat(idx==i,1),'.','MarkerSize',12)
+    hold on
+    plot(C(i,2), 164-C(i,1), '+', 'MarkerSize', 30)
+end
+Centers = [C(:,2), C(:,1)];
+[predict_mat, sigma_mat, real_mat] = bayesain_linear_regression(countMaps, Centers);
+figure
+imshow(predict_mat,[])
+[nRange, ~] = computeResultRange(gridSz);
+[PAI_pred,PEI_pred,PAI_best] = computePAIandPEI(predict_mat,real_mat,nRange,true);
